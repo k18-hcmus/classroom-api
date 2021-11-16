@@ -105,7 +105,6 @@ class ClassroomCtrl extends BaseCtrl {
   async createClassroom(req, res) {
     const userId = req.user.id
     const { name, section, subject } = req.body
-    console.log(name, section, subject)
     if (!name) {
       res.status(httpStatusCodes.BAD_REQUEST).send('Name is required')
     }
