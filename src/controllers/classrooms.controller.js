@@ -79,11 +79,11 @@ class ClassroomCtrl extends BaseCtrl {
   @get('/:id', auth())
   async getDetailClassroom(req, res) {
     let classroom
+    let { id: classroomId } = req.params
     try {
       classroom = await db.Classroom.findOne({
-        where: { id: req.params.id },
+        where: { id: classroomId },
       })
-      console.log(classroom)
     } catch (error) {
       console.log(error)
     }
