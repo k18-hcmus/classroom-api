@@ -1,5 +1,6 @@
 import db from 'src/models'
 import { CLASSROOM_ROLE } from 'src/utils/constants'
+import httpStatusCodes from 'http-status-codes'
 
 export function ensureTeacher() {
   return async (req, res, next) => {
@@ -16,7 +17,7 @@ export function ensureTeacher() {
     if (!isTeacher) {
       return res
         .status(httpStatusCodes.BAD_REQUEST)
-        .send({ message: 'Not have permission to invite user' })
+        .send({ message: 'You do not have permissions to perform this action' })
     }
 
     next && (await next())
