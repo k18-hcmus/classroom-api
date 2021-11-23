@@ -332,9 +332,15 @@ class ClassroomCtrl extends BaseCtrl {
 
   @post('/:id/remove-user', auth(), ensureTeacher())
   async removeUser(req, res) {
+    const userId = req.user.id
     const { id: classroomId } = req.params
     const { userId: removingUserId } = req.body
 
+    if (userId === removingUserId) {
+      return res
+        .status(httpStatusCodes.BAD_REQUEST)
+        .send({ message: 'You can not remove yourself' })
+    }
     await db.ClassroomUser.destroy({
       where: {
         classroomId,
