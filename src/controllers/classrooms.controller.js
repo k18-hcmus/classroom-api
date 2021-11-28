@@ -84,6 +84,7 @@ class ClassroomCtrl extends BaseCtrl {
     }
     res.status(httpStatusCodes.OK).send(classrooms)
   }
+
   @get('/:id', auth())
   async getDetailClassroom(req, res) {
     let classroom
@@ -98,6 +99,9 @@ class ClassroomCtrl extends BaseCtrl {
             model: db.ClassroomUser,
             attributes: ['role'],
             where: { userId },
+          },
+          {
+            model: db.Grade,
           },
         ],
       })
