@@ -90,7 +90,6 @@ class ClassroomCtrl extends BaseCtrl {
     let classroom
     let { id: classroomId } = req.params
     const userId = req.user.id
-    console.log(userId)
     try {
       classroom = await db.Classroom.findOne({
         where: { id: classroomId },

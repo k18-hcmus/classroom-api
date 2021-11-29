@@ -29,20 +29,24 @@ class GradesCtrl extends BaseCtrl {
     }
     res.status(httpStatusCodes.OK).send(grade)
   }
-  @put('/:grade_id')
+  @put('/:gradeId', auth())
   async updateGrade(req, res) {
-    let { grade_id: id_grade } = req.params
+    let { gradeId } = req.params
     let { name, point } = req.body
     let grade
     if (!name && !point) {
       res.status(httpStatusCodes.BAD_REQUEST).send('Name and point is required')
     }
     try {
-      grade = await db.Grade.findOne({ where: { id: id_grade } })
-      grade.update({
-        name: name,
-        point: point,
-      })
+      await db.Grade.update(
+        {
+          name: name,
+          point: point,
+        },
+        {
+          where: { id: gradeId },
+        }
+      )
       await grade.save()
     } catch (error) {
       console.log(error)
