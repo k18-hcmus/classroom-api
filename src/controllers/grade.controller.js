@@ -30,13 +30,12 @@ class GradesCtrl extends BaseCtrl {
     }
     res.status(httpStatusCodes.OK).send(grade)
   }
-  @put('/:id_grade')
+  @put('/:id_grade', auth())
   async updateGrade(req, res) {
     let { id_grade: id } = req.params
 
     let { id: classroomId } = req.params
     let { name, point } = req.body
-    console.log('id _11__grade ', id)
     let grade
     try {
       grade = await db.Grade.findOne({ where: { id } })
