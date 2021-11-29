@@ -24,7 +24,6 @@ class GradesCtrl extends BaseCtrl {
         point: point,
         classroomId,
       })
-      console.log('classroomId:', classroomId, 'name:', name, 'point:', point)
     } catch (error) {
       console.log(error)
     }
