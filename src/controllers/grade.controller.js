@@ -1,6 +1,6 @@
 import BaseCtrl from './base'
 import db from '../models/index'
-import { controller, get, post, del } from 'route-decorators'
+import { controller, get, post, del, put } from 'route-decorators'
 import httpStatusCodes from 'http-status-codes'
 import { auth } from '../middleware'
 import debug from 'src/utils/debug'
@@ -46,8 +46,30 @@ class GradesCtrl extends BaseCtrl {
     } catch (error) {
       debug.log('grade-ctrl', error)
     }
-
     res.status(httpStatusCodes.OK).send(grades)
+  }
+
+  @put('/:gradeId', auth())
+  async updateGrade(req, res) {
+    let { gradeId } = req.params
+    let { name, point } = req.body
+    if (!name && !point) {
+      res.status(httpStatusCodes.BAD_REQUEST).send('Name and point is required')
+    }
+    try {
+      await db.Grade.update(
+        {
+          name: name,
+          point: point,
+        },
+        {
+          where: { id: gradeId },
+        }
+      )
+    } catch (error) {
+      debug.log('grade-ctrl', error)
+    }
+    res.status(httpStatusCodes.OK).send({ message: 'Update assignment successful' })
   }
 
   @del('/:gradeId', auth())
@@ -61,4 +83,5 @@ class GradesCtrl extends BaseCtrl {
     res.status(httpStatusCodes.OK).send({ message: 'Delete assignment successful' })
   }
 }
+
 export default GradesCtrl
