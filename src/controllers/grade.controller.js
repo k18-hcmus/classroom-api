@@ -6,7 +6,7 @@ import { auth } from '../middleware'
 
 @controller('/api/classrooms/:id/grades')
 class GradesCtrl extends BaseCtrl {
-  @post('/')
+  @post('/', auth())
   async createGrade(req, res) {
     let { point, name } = req.body
     let { id: classroomId } = req.params
