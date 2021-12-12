@@ -4,11 +4,9 @@ import { controller, get, post, del, put } from 'route-decorators'
 import httpStatusCodes from 'http-status-codes'
 import { auth } from '../middleware'
 import debug from 'src/utils/debug'
-
-const { Op } = require('sequelize')
-
-import debug from 'src/utils/debug'
-
+import { Op } from 'sequelize'
+import classroomService from 'src/services/classroom.service'
+import { CLASSROOM_ROLE } from 'src/utils/constants'
 
 @controller('/api/classrooms/:id/grades')
 class GradesCtrl extends BaseCtrl {
@@ -21,18 +19,38 @@ class GradesCtrl extends BaseCtrl {
     if (!name && !point) {
       res.status(httpStatusCodes.BAD_REQUEST).send('Name and point is required')
     }
-    let grade
-    try {
-      grade = await db.Grade.create({
-        name: name,
-        point: point,
-        index: index,
-        classroomId,
+    const result = await db.sequelize.transaction(async (t) => {
+      const grade = await db.Grade.create(
+        {
+          name: name,
+          point: point,
+          index: index,
+          classroomId,
+        },
+        { transaction: t }
+      )
+
+      // Create grade for exist student in class
+      const gradeId = grade.id
+      const students = await classroomService.getUsersByClassroomId(classroomId, {
+        roles: [CLASSROOM_ROLE.STUDENT],
       })
-    } catch (error) {
-      console.log(error)
-    }
-    res.status(httpStatusCodes.OK).send(grade)
+      const gradeUsers = students.map((s) => ({ gradeId, userId: s.userId }))
+      await db.GradeUser.bulkCreate(gradeUsers, { transaction: t })
+      return grade
+    })
+
+    // try {
+    //   grade = await db.Grade.create({
+    //     name: name,
+    //     point: point,
+    //     index: index,
+    //     classroomId,
+    //   })
+    // } catch (error) {
+    //   console.log(error)
+    // }
+    res.status(httpStatusCodes.OK).send(result)
   }
 
   @put('/arrange/:idGrade1/:idGrade2', auth())
@@ -69,7 +87,7 @@ class GradesCtrl extends BaseCtrl {
     } catch (error) {
       return res.status(500).json({ msg: error.message })
     }
-
+  }
 
   @get('/', auth())
   async getGrades(req, res) {
@@ -79,9 +97,13 @@ class GradesCtrl extends BaseCtrl {
 
     try {
       grades = await db.Grade.findAll({
-        where: {
-          classroomId,
-        },
+        where: { classroomId },
+        include: [
+          {
+            model: db.GradeUser,
+            include: db.User,
+          },
+        ],
       })
     } catch (error) {
       debug.log('grade-ctrl', error)
@@ -102,9 +124,7 @@ class GradesCtrl extends BaseCtrl {
           name: name,
           point: point,
         },
-        {
-          where: { id: gradeId },
-        }
+        { where: { id: gradeId } }
       )
     } catch (error) {
       debug.log('grade-ctrl', error)
