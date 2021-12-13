@@ -20,7 +20,9 @@ export async function getUsersByClassroomId(classroomId, opt = { roles: [] }) {
     raw: true,
     include: {
       model: db.User,
-      exclude: ['password'],
+      attributes: {
+        exclude: ['password'],
+      },
     },
   })
 
