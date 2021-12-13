@@ -19,37 +19,17 @@ class GradesCtrl extends BaseCtrl {
     if (!name && !point) {
       res.status(httpStatusCodes.BAD_REQUEST).send('Name and point is required')
     }
-    const result = await db.sequelize.transaction(async (t) => {
-      const grade = await db.Grade.create(
-        {
-          name: name,
-          point: point,
-          index: index,
-          classroomId,
-        },
-        { transaction: t }
-      )
 
-      // Create grade for exist student in class
-      const gradeId = grade.id
-      const students = await classroomService.getUsersByClassroomId(classroomId, {
-        roles: [CLASSROOM_ROLE.STUDENT],
+    try {
+      grade = await db.Grade.create({
+        name: name,
+        point: point,
+        index: index,
+        classroomId,
       })
-      const gradeUsers = students.map((s) => ({ gradeId, userId: s.userId }))
-      await db.GradeUser.bulkCreate(gradeUsers, { transaction: t })
-      return grade
-    })
-
-    // try {
-    //   grade = await db.Grade.create({
-    //     name: name,
-    //     point: point,
-    //     index: index,
-    //     classroomId,
-    //   })
-    // } catch (error) {
-    //   console.log(error)
-    // }
+    } catch (error) {
+      debug.log('grade-ctrl', error)
+    }
     res.status(httpStatusCodes.OK).send(result)
   }
 
