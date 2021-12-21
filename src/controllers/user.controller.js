@@ -23,21 +23,23 @@ class UserCtrl extends BaseCtrl {
   @post('/allUser', auth())
   async updateAllUser(req, res) {
     const data = req.body
-    console.log('data:', req.body)
+    console.log('data:', data)
     try {
-      data.map(async (user) => {
-        await db.User.update(
-          {
-            lastName: user.lastName,
-            firstName: user.firstName,
-            studentId: user.studentId,
-          },
-          {
-            where: { id: user.id },
-          }
-        )
-      })
-      res.send('ok')
+      let allUser = await Promise.all(
+        data.map(async (user) => {
+          await db.User.update(
+            {
+              lastName: user.lastName,
+              firstName: user.firstName,
+              studentId: user.studentId,
+            },
+            {
+              where: { id: user.id },
+            }
+          )
+        })
+      )
+      res.status(httpStatusCodes.OK).send({ message: 'Update all user success', data: allUser })
     } catch (error) {
       return res.status(500).json({ msg: error.message })
     }
