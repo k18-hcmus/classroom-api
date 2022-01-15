@@ -6,6 +6,7 @@ export const CLASSROOM_ROLE = {
   STUDENT: 'STUDENT',
   TEACHER: 'TEACHER',
   ADMIN: 'ADMIN',
+  USER: 'USER',
 }
 export const CLASSROOM_STATUS = {
   PENDING: 'PENDING',
