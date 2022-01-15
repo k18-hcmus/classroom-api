@@ -86,7 +86,7 @@ class ClassroomCtrl extends BaseCtrl {
     }
     res.status(httpStatusCodes.OK).send(classrooms)
   }
-  @get('/all-classrooms', auth())
+  @get('/admin/classrooms', auth())
   async getClassroomByAdmin(req, res) {
     let classrooms
     try {
