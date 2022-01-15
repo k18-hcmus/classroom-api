@@ -1,5 +1,5 @@
 import BaseCtrl from './base'
-import { controller, get, post, put } from 'route-decorators'
+import { controller, get, del, put } from 'route-decorators'
 import httpStatusCodes from 'http-status-codes'
 import db from '../models/index'
 import { auth, ensureRoles } from '../middleware'
@@ -90,6 +90,21 @@ class UserCtrl extends BaseCtrl {
         raw: true,
       })
       res.json(user)
+    } catch (error) {
+      res.status(httpStatusCodes.INTERNAL_SERVER_ERROR, error.message)
+    }
+  }
+
+  @del('/:id', auth(), ensureRoles([CLASSROOM_ROLE.ADMIN]))
+  async deleteUser(req, res) {
+    const userId = req.params.id
+    if (!userId) {
+      return res.status(httpStatusCodes.BAD_REQUEST)
+    }
+
+    try {
+      await db.User.destroy({ where: { id: userId } })
+      res.status(httpStatusCodes.OK).send('OK')
     } catch (error) {
       res.status(httpStatusCodes.INTERNAL_SERVER_ERROR, error.message)
     }
