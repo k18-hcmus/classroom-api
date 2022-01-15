@@ -103,7 +103,7 @@ class UserCtrl extends BaseCtrl {
         res.status(httpStatusCodes.BAD_REQUEST).send('No UserId')
       }
       let message = ''
-      let { firstName, lastName, phone, studentId } = req.body
+      let { firstName, lastName, phone, studentId, status } = req.body
       //check student ID
       if (studentId) {
         const checkStudentId = await db.User.findOne({
@@ -128,6 +128,7 @@ class UserCtrl extends BaseCtrl {
           lastName: lastName,
           phone: phone,
           studentId: studentId,
+          status,
         },
         {
           where: { id: userId },
