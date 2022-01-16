@@ -156,7 +156,6 @@ class GradesCtrl extends BaseCtrl {
       await db.Notification.bulkCreate(notifications)
 
       const studentIds = students.map((s) => s.userId)
-      console.log(studentIds)
       socket.notifyMultipleClients(studentIds)
 
       res.status(httpStatusCodes.OK).send({ message: 'Finalized success' })
