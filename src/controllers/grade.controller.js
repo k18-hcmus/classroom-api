@@ -198,8 +198,6 @@ class GradesCtrl extends BaseCtrl {
           roles: [CLASSROOM_ROLE.TEACHER],
         })
 
-        debug.log('grade-crtl', teachers)
-
         const notifications = teachers.map((t) => ({
           userId: t.userId,
           content: `New grade review in classroom ${classroom.name} for grade ${grade.name}`,
