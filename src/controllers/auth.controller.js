@@ -299,23 +299,6 @@ class AuthCtrl extends BaseCtrl {
       res.status(httpStatusCodes.BAD_REQUEST).send(err.message)
     }
   }
-<<<<<<< HEAD
-  @put('/forgot-password')
-  async forgotPassword(req, res) {
-    const { email } = req.body
-    const checkUser = await db.User.findOne({
-      where: { email: String(email).toLowerCase() },
-    })
-    if (!checkUser) {
-      res.status(400).json({ success: false, message: 'Email does not exist' })
-    }
-    const activation_token = jwt.sign({ id: checkUser.id }, process.env.RESET_PASSWORD_KEY, {
-      expiresIn: '5m',
-    })
-    const url = `${process.env.FRONTEND_URL}/resetpassword/${activation_token}`
-    const emailTemplate = generateVerifyEmailTemplate(url)
-    sendEmail(email, emailTemplate)
-=======
   @post('/forgot-password')
   async forgotPassword(req, res) {
     try {
@@ -358,7 +341,6 @@ class AuthCtrl extends BaseCtrl {
     } catch (error) {
       res.status(httpStatusCodes.BAD_REQUEST).send(error.message)
     }
->>>>>>> 8ab38343fcaa6e13013fa7f5491d5bea155d5776
   }
 }
 export default AuthCtrl
