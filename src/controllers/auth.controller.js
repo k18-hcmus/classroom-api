@@ -278,7 +278,7 @@ class AuthCtrl extends BaseCtrl {
         password: hash,
         firstName,
         lastName,
-        status: ACCOUNT_STATUS.PENDING,
+        status: ACCOUNT_STATUS.ACTIVE,
         role,
       })
 
