@@ -261,7 +261,26 @@ class ClassroomCtrl extends BaseCtrl {
 
     res.status(httpStatusCodes.OK).send(users)
   }
+  @get('/:id/admin/users', auth())
+  async getClassroomUsersAdmin(req, res) {
+    const { id: classroomId } = req.params
 
+    const isUserInClassroom = await db.ClassroomUser.count({
+      where: {
+        classroomId,
+      },
+    })
+
+    if (!isUserInClassroom) {
+      return res
+        .status(httpStatusCodes.BAD_REQUEST)
+        .send({ message: 'User do not belong to classroom' })
+    }
+
+    const users = await classroomService.getUsersByClassroomId(classroomId)
+
+    res.status(httpStatusCodes.OK).send(users)
+  }
   @post('/:id/invite', auth(), ensureTeacher())
   async inviteUsers(req, res) {
     const userId = req.user.id

@@ -111,7 +111,7 @@ class UserCtrl extends BaseCtrl {
   }
 
   @put('/:id', auth(), ensureRoles([CLASSROOM_ROLE.ADMIN]))
-  async updateUserInfo(req, res) {
+  async updateUserInfor(req, res) {
     try {
       const userId = req.params.id
       if (!userId) {
