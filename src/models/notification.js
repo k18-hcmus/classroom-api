@@ -10,7 +10,7 @@ export default (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       onDelete: 'CASCADE',
       references: {
-        model: 'Users',
+        model: 'User',
         key: 'id',
       },
     },
@@ -20,6 +20,14 @@ export default (sequelize, DataTypes) => {
     },
     status: {
       type: DataTypes.STRING,
+    },
+    classroomId: {
+      type: DataTypes.INTEGER,
+      onDelete: 'CASCADE',
+      references: {
+        model: 'Classroom',
+        key: 'id',
+      },
     },
   }
 

@@ -151,6 +151,7 @@ class GradesCtrl extends BaseCtrl {
         userId: s.userId,
         content: `Grade ${grade.name} in classroom ${classroom.name} has been finalized.`,
         status: NOTIFICATION_STATUS.UNREAD,
+        classroomId,
       }))
 
       await db.Notification.bulkCreate(notifications)
@@ -202,6 +203,7 @@ class GradesCtrl extends BaseCtrl {
           userId: t.userId,
           content: `New grade review in classroom ${classroom.name} for grade ${grade.name}`,
           status: NOTIFICATION_STATUS.UNREAD,
+          classroomId: classroom.id,
         }))
         await db.Notification.bulkCreate(notifications)
 
@@ -251,9 +253,6 @@ class GradesCtrl extends BaseCtrl {
           reviewGradeId,
           userId,
         })
-        res
-          .status(httpStatusCodes.OK)
-          .send({ comment: response, message: 'Comment review success' })
 
         // createNotify
         const reviewGrade = await db.ReviewGrade.findByPk(reviewGradeId, { raw: true })
@@ -266,11 +265,35 @@ class GradesCtrl extends BaseCtrl {
             userId: ownerId,
             content: `Teacher have reply your review on grade ${grade.name}`,
             status: NOTIFICATION_STATUS.UNREAD,
+            classroomId: grade.classroomId,
           })
           socket.notifyClient(ownerId)
         }
+        // student have comment, notify to all teachers
+        else {
+          const classroom = await db.Classroom.findByPk(grade.classroomId)
+          const teachers = await classroomService.getUsersByClassroomId(classroom.id, {
+            roles: [CLASSROOM_ROLE.TEACHER],
+          })
+
+          const notifications = teachers.map((t) => ({
+            userId: t.userId,
+            content: `Student comment on grade ${grade.name} review in class ${classroom.name}`,
+            status: NOTIFICATION_STATUS.UNREAD,
+            classroomId: classroom.id,
+          }))
+          await db.Notification.bulkCreate(notifications)
+
+          const teacherIds = await teachers.map((t) => t.userId)
+          socket.notifyMultipleClients(teacherIds)
+        }
+        return res
+          .status(httpStatusCodes.OK)
+          .send({ comment: response, message: 'Comment review success' })
       } catch (error) {
-        res.status(httpStatusCodes.BAD_REQUEST).send({ message: 'Comment review fail' })
+        debug.log('grade-ctrl', error)
+
+        return res.status(httpStatusCodes.BAD_REQUEST).send({ message: 'Comment review fail' })
       }
     }
   }
@@ -287,17 +310,18 @@ class GradesCtrl extends BaseCtrl {
       )
 
       const updatedGrade = await db.Grade.findByPk(gradeId, { raw: true })
-
       // notify to student
       await db.Notification.create({
         userId,
         content: `Teacher have finalize your review on grade ${updatedGrade.name}`,
         status: NOTIFICATION_STATUS.UNREAD,
+        classroomId: updatedGrade.classroomId,
       })
       socket.notifyClient(userId)
 
       res.status(httpStatusCodes.OK).send({ gradeUser })
     } catch (error) {
+      debug.log('grade-ctrl', error)
       res.status(httpStatusCodes.BAD_REQUEST).send({ message: 'Get review grade fail' })
     }
   }

@@ -37,6 +37,7 @@ db.User.hasMany(db.Notification, { foreignKey: 'userId' })
 db.Classroom.belongsTo(db.User, { foreignKey: 'ownerId', as: 'Owner' })
 db.Classroom.hasMany(db.ClassroomUser, { foreignKey: 'classroomId' })
 db.Classroom.hasMany(db.Grade, { foreignKey: 'classroomId' })
+db.Classroom.hasMany(db.Notification, { foreignKey: 'classroomId' })
 
 db.ClassroomUser.belongsTo(db.User, { foreignKey: 'userId' })
 db.ClassroomUser.belongsTo(db.Classroom, { foreignKey: 'classroomId' })
@@ -57,5 +58,6 @@ db.CommentReviewGrade.belongsTo(db.ReviewGrade, { foreignKey: 'reviewGradeId' })
 db.CommentReviewGrade.belongsTo(db.User, { foreignKey: 'userId' })
 
 db.Notification.belongsTo(db.User, { foreignKey: 'userId' })
+db.Notification.belongsTo(db.Classroom, { foreignKey: 'classroomId' })
 
 export default db
