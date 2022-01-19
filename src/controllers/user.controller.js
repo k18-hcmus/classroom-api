@@ -50,9 +50,12 @@ class UserCtrl extends BaseCtrl {
       if (phone) {
         const checkPhone = validatePhoneNumber(phone)
         if (!checkPhone) {
-          message = 'Phone number invalid'
+          message = 'Phone number must be 10 number'
           phone = null
         }
+      }
+      if (message) {
+        return res.status(httpStatusCodes.BAD_REQUEST).json({ message })
       }
       await db.User.update(
         {
